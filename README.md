@@ -1,5 +1,5 @@
-Ninja Guide to Bioinformatics
-=============================
+Ninja Guide to Bioinformatics (NG2B)
+====================================
 
 The NG2B.md document comprises notes and guidelines to perform common task in Bioinformatics. The document provide answers to _Hot to...?_ questions and consist of three major sections:
 
