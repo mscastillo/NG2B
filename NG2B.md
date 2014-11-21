@@ -223,3 +223,41 @@ nano .ssh/authorized_keys
 ```
 
 > To speed up the connection between servers, consider to set an alias such as `alias superhanz="ssh ms2188@superhanz"`.
+
+## How to work safely in the server?
+
+Using `screen` you can have multiple virtual terminals with just one physical process. 
+
+```
+screen --help
+```
+
+Once you have connected to your dedicated server, `screen` allows you to create a virtual session on multiple windows.
+
+```
+ssh runic
+screen
+```
+
+A good practice is to invoke `screen` by parsing a session name using the `-S` option. 
+
+```
+screen -S myscreen
+```
+
+Instead of shell commands, screen uses <kbd>Ctrl</kbd>+<kbd>a</kbd> as a signal to send commands. To get help, just use <kbd>Ctrl</kbd>+<kbd>a</kbd> and  <kbd>?</kbd> . To exit and kill the active screen use  <kbd>Ctrl</kbd>+<kbd>a</kbd>  and   <kbd>k</kbd> . If you need to close your session, detach `screen` by using  <kbd>Ctrl</kbd>+<kbd>a</kbd>  and  <kbd>d</kbd> . Later, you can list your virtual sessions and re-attach then.
+
+```
+ssh ms2188@tropic
+screen -ls
+#There is a screen on:
+#	24298.myscreen		(01/08/13 11:25:00)	(Detached)
+#	24254.pts-0.tropic	(01/08/13 11:26:00)	(Detached)
+#1 Socket in /var/run/screen/S-ms2188.
+screen -r 24298
+```
+
+> To improve your experience using `screen`, consider to customize the environment by setting up your `.screenrc` screen. For example:  [.screenrc](https://github.com/mscastillo/bash/blob/master/.screenrc).
+
+# PROCESSING DATA
+_Coming next..._
