@@ -1,7 +1,9 @@
-Ninja Guide to Bioinformatics (NG2B)
-====================================
+Ninja Guide to Bioinformatics
+=============================
 
-The NG2B.md document comprises notes and guidelines to perform common task in Bioinformatics. The document provide answers to _Hot to...?_ questions and consists of three major sections:
+The Ninja Guide to Bioinformatics (NG2B) consists of a _MarkDown_ document including notes, tips and guidelines describing (_i_) how to perform common task and analyses in Bioinformatics and (_ii_) establishing simple _copy/paste_ solutions to them. 
+
+The document consists of a set of _Hot to...?_ questions/answers divided in three major sections:
 
 * Working with _R_
 * Working on the servers
