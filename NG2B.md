@@ -1,4 +1,3 @@
-
 # WORKING WITH R
 
 ## How to make a Venn diagram from peaks files?
@@ -36,7 +35,7 @@ R --version
 
 To manually install an old package not supported by your current version use the terminal command with the `INSTALL` option.
 
-```r
+```bash
 R CMD INSTALL myoldpacakage.tar.gz
 ```
 
@@ -102,7 +101,22 @@ Using the `ssh` file system client. In the next example, the folder called _code
 sshfs -o idmap=user ms2188@superhanz.cscr.cam.ac.uk:codex/ superhanz
 ```
 
-## To limit resources to any feature, use the corresponding flag followed by the limit you want to set. For instance, if you want to limit the memory by the half of the maximum available, use `-m` followed by your limit in kilobytes. You can check the total and free memory by using the `free` command. Use `unlimited` to restore it to default.
+
+## How to limit the amount of memory to use?
+
+Using the `ulimi` command you can control the resources of the server. This command is available on package `util-serve`. Use `-a` option to list all possible features to be set. To get the current value of any feature, just use the option without parsing any value.
+
+```bash
+sudo aptitude search util-vserver
+ulimit -a
+#  core file size          (blocks, -c) 0
+#  data seg size           (kbytes, -d) unlimited
+#  …
+ulimit -d
+#  unlimited
+```
+
+To limit resources to any feature, use the corresponding flag followed by the limit you want to set. For instance, if you want to limit the memory by the half of the maximum available, use `-m` followed by your limit in kilobytes. You can check the total and free memory by using the `free` command. Use `unlimited` to restore it to default.
 
 ```bash
 free
@@ -113,3 +127,99 @@ free
 ulimit -m 30000000 ; ./script.sh ; ulimit -m unlimited
 ```
 
+
+## How to set scheduled jobs?
+
+Using the _crond_ daemon. This program should be running since the computer was reboot.
+
+```bash
+ps -ef | grep crond
+```
+
+
+To get access to the schedules jobs, use the _crontab_ command. The _-l_ option will list all actived jobs. 
+
+```bash
+crontab -l
+```
+
+
+To edit it, use the `-e` option. Add a new line to set a new scheduled job. The timestamp format is:
+
+## How to backup a MySQl database?
+
+Using the `mysqldump` command.
+
+```bash
+mysqldump -u $USER -p$PASSWORD $STAGINGDB > staging.sql
+mysqldump -u $USER -p$PASSWORD $BIOINFORMATICSDB > bioinformatics.sql
+```
+
+
+## How to run parallel jobs?
+
+Using the `parallel` command. Use brackets in the statement as the input source, with the arguments placed after the triple colon.
+
+```bash
+parallel -help
+parallel 'gunzip {}' ::: ls *-*/*.fq.gz
+parallel 'fastqc --quiet -f fastq {}' ::: ls *-*/*.fastq
+parallel 'gzip -f {}' ::: ls */*-*.fastq
+```
+
+
+## How to create a symbolic link?
+
+Using the **ln** command. You can use **df** to browse your disk file system.
+
+```bash
+df -h
+#Filesystem            Size  Used Avail Use% Mounted on
+#/dev/sdc1              37G  5.5G   30G  16% /
+#/dev/sdb1             2.7T  1.9T  672G  75% /projects
+#/dev/sda1             2.7T  2.4T  234G  92% /home
+#//pacific/gottgens/    22T   21T  963G  96% /home/rlh60/Pacific
+#//pacific/huntly/      19T  9.1T  9.2T  50% /home/rlh60/Brian_Pacific
+#apollo:/export/data    19T  5.7T   12T  33% /data
+#...
+cd
+ln -s /data
+ls -l
+```
+
+
+You can also create symbolic links of your favourites programs into **/bin** to avoid using the full path.
+
+```bash
+# do not use the full path to your programs
+/home/Programs/bowtie-0.12.9/bowtie -m 1 -v 2 -S --phred33-quals hg19_ucsc A006.fastq > A006.sam
+# use a symbolic link instead
+ln -s /home/Programs/bowtie-0.12.9/bowtie /bin
+bowtie -m 1 -v 2 -S --phred33-quals hg19_ucsc A006.fastq > A006.sam
+```
+
+
+## How to manage RSA keys for authentication?
+
+Using `ssh-keygen` you can generate private-public key pairs. Don’t use a _passphrase_ to avoid user monitoring every time you want to login.
+
+```bash
+ssh ms2188@runic
+ssh-keygen -t rsa -C "RSA key from ms2188@runic"
+#Created directory '/home/ms2188/.ssh'.
+#Enter passphrase (empty for no passphrase):
+#Enter same passphrase again:
+#Your identification has been saved in /home/ms2188/.ssh/id_rsa.
+#Your public key has been saved in /home/ms2188/.ssh/id_rsa.pub.
+#...
+cat .ssh/id_rsa.pub
+```
+
+Now just add your _public key_ into the _authorized keys_ file in the server of interest.
+
+```bash
+ssh ms2188@superhanz
+nano .ssh/authorized_keys
+```
+
+> To speed up the connection between servers, consider to set an alias such as `alias superhanz="ssh ms2188@superhanz"`.
