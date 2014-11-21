@@ -102,3 +102,14 @@ Using the `ssh` file system client. In the next example, the folder called _code
 sshfs -o idmap=user ms2188@superhanz.cscr.cam.ac.uk:codex/ superhanz
 ```
 
+## To limit resources to any feature, use the corresponding flag followed by the limit you want to set. For instance, if you want to limit the memory by the half of the maximum available, use `-m` followed by your limit in kilobytes. You can check the total and free memory by using the `free` command. Use `unlimited` to restore it to default.
+
+```bash
+free
+#               total       used       free     shared    buffers     cached
+#  Mem:      60000000   10000000   50000000          0      19900    9520784
+#  -/+ buffers/cache:   42010312   23954420
+#  Swap:     78977020      53180   78923840
+ulimit -m 30000000 ; ./script.sh ; ulimit -m unlimited
+```
+
