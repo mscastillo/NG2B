@@ -1,18 +1,8 @@
 Ninja Guide to Bioinformatics
 =============================
 
-# Basic tools
+The NG2B.md document comprises notes and guidelines to perform common task in Bioinformatics. The document provide answers to _Hot to...?_ questions and consist of three major sections:
 
-## Terminal-based programs suites
-
-* bedtools (http://bedtools.readthedocs.org)
-* samtools (http://www.htslib.org)
-
-## On-line resources and databases
-
-* NCBI
- * NCBI - Gene (http://www.ncbi.nlm.nih.gov/gene)
- * NCBI - GEO (http://www.ncbi.nlm.nih.gov/geo)
-* UCSC
- * UCSC genome browser (http://genome.ucsc.edu/cgi-bin/hgGateway)
- * UCSC tables (http://genome.ucsc.edu/cgi-bin/hgTables)
+* Working with _R_
+* Working on the servers
+* Processing data
