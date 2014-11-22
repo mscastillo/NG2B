@@ -85,8 +85,8 @@ paired_reads_1[1]
 Create a _data-frame_ with your selected features-metadata and write it into a file using `write.table`.
 
 ```r
-gr = filtered$paired_reads_1
-df = data.frame(chr=as.character(seqnames(gr)),starts=start(ranges(gr)),ends=end(ranges(gr)), strand=as.character(strand(gr)),id=c(gr$id),flag=c(gr$flag))
+gr <- filtered$paired_reads_1
+df <- data.frame(chr=as.character(seqnames(gr)),starts=start(ranges(gr)),ends=end(ranges(gr)), strand=as.character(strand(gr)),id=c(gr$id),flag=c(gr$flag))
 write.table(df,file="paired_reads_1.bed",quote=F,sep="\t",row.names=F,col.names=F)
 ```
 
@@ -228,26 +228,26 @@ nano .ssh/authorized_keys
 
 Using `screen` you can have multiple virtual terminals with just one physical process. 
 
-```
+```bash
 screen --help
 ```
 
 Once you have connected to your dedicated server, `screen` allows you to create a virtual session on multiple windows.
 
-```
+```bash
 ssh runic
 screen
 ```
 
 A good practice is to invoke `screen` by parsing a session name using the `-S` option. 
 
-```
+```bash
 screen -S myscreen
 ```
 
 Instead of shell commands, screen uses <kbd>Ctrl</kbd>+<kbd>a</kbd> as a signal to send commands. To get help, just use <kbd>Ctrl</kbd>+<kbd>a</kbd> and  <kbd>?</kbd> . To exit and kill the active screen use  <kbd>Ctrl</kbd>+<kbd>a</kbd>  and   <kbd>k</kbd> . If you need to close your session, detach `screen` by using  <kbd>Ctrl</kbd>+<kbd>a</kbd>  and  <kbd>d</kbd> . Later, you can list your virtual sessions and re-attach then.
 
-```
+```bash
 ssh ms2188@tropic
 screen -ls
 #There is a screen on:
