@@ -2,7 +2,7 @@
 
 ## How to make a Venn diagram from peaks files?
 
-Using _Vennerable_, an R package available at_ R-Forge_. Its installation may depends on any of the next packages.
+Using _Vennerable_, an R package available at _R-Forge_. Its installation may depends on any of the next packages.
 
 ```r
 source("http://bioconductor.org/biocLite.R")
@@ -130,14 +130,14 @@ ulimit -m 30000000 ; ./script.sh ; ulimit -m unlimited
 
 ## How to set scheduled jobs?
 
-Using the _crond_ daemon. This program should be running since the computer was reboot.
+Using the `crond` daemon. This program should be running since the computer was reboot.
 
 ```bash
 ps -ef | grep crond
 ```
 
 
-To get access to the schedules jobs, use the _crontab_ command. The _-l_ option will list all actived jobs. 
+To get access to the schedules jobs, use the `crontab` command. The `-l` option will list all actived jobs. 
 
 ```bash
 crontab -l
@@ -170,7 +170,7 @@ parallel 'gzip -f {}' ::: ls */*-*.fastq
 
 ## How to create a symbolic link?
 
-Using the **ln** command. You can use **df** to browse your disk file system.
+Using the `ln` command. You can use `df` to browse your disk file system.
 
 ```bash
 df -h
