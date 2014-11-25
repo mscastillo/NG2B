@@ -441,4 +441,194 @@ Alternatively, you can run it in the background and monitor the progress by disp
 tail -f batch.log
 ```
 
-> For jobs that might take a long time to finish, it is highly recommended the use of a screen (check it how [here](#screen)).
+> For jobs that might take a long time to finish, it is highly recommended the use of `screen` (check it how [here](#screen)).
+
+
+## How to process replicated ChIP-seq data?
+
+Performing a correlation test with `sam2bigWig` between the two samples. Given one of the samples, use the `-c` flag to pass the pre-processed bigwig file of the second one.
+
+```bash
+sam2bigWig -g GSE26014 -m GSM638311 -x hg19
+sam2bigWig -g GSE26014 -m GSM638310 -x hg19 -c GSE26014/GSM638311/GSM638311.bw >> batch.log
+#...
+#==> Running wigCorrelate
+#   - correlation: 0.974446
+```
+
+If the correlation between them is high than a threshold (typically 0.8) merge the *fastq* files previously processed with `get_data`. Otherwise, consider them as different samples.
+
+```bash
+correlation="$(grep 'correlation: * [0-9].[0-9]*' batch.log | grep -o [0-9].[0-9]*)"
+echo $correlation
+# 0.974446
+mkdir GSE26014/GSM638310-11
+cat GSE*/GSM638310/GSM638310.fastq GSE*/GSM638311/GSM638311.fastq > GSE*/GSM638310-11/GSM638310-11.fastq
+```
+
+Subsequently, re-run `get_data` with the `--merged` flag to process the concatenate *fastq* file and `sam2bigWig` to compute the final bed files.
+
+```bash
+get_data -g GSE26014 -m GSM638310-11 -x hg19 --merged
+sam2bigWig -g GSE26014 -m GSM638310-11 -x hg19
+```
+
+
+## How to process peak files in bigWig format?
+
+Using the `run_MACS2` *Perl* script. This script requires the bed files of two samples, the experimental and the control one, and a p-value or q-value cutt-off. The output are two files in bed and a bigBed formats, both with a peak length of 400bp.
+
+```bash
+cd GSE26014/GSM638310-11
+run_MACS2.pl GSM638310-11.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-5
+cd ../..
+```
+
+> The *Perl* script described above has been replaced in the pipeline by a *Bash* script called `run_macs2`. Use the `-h`  parameter for additional details.
+
+
+
+
+
+## How a pipeline shell-script should looks like?
+
+```bash
+#!/bin/bash
+
+date >> batch.log
+echo '# NEW BATCH' >> batch.log
+
+date >> batch.log
+echo '# PROCESSING INDIVIDUAL FASTQ FILES' >> batch.log
+
+date >> batch.log
+get_data -g GSE26014 -m GSM638310 -s SRX/SRX038/SRX038910 -x hg19 >> batch.log
+
+date >> batch.log
+get_data -g GSE26014 -m GSM638311 -s SRX/SRX038/SRX038911 -x hg19 >> batch.log
+
+date >> batch.log
+echo '# PROCESSING SAM FILES' >> batch.log
+
+date >> batch.log
+sam2bigWig -g GSE26014 -m GSM638310 -x hg19 >> batch.log
+
+date >> batch.log
+sam2bigWig -g GSE26014 -m GSM638311 -x hg19 -c GSE26014/GSM638310/GSM638310.bw >> batch.log
+
+date >> batch.log
+echo '# CORRELATION TEST' >> batch.log
+CORRELATION="$(grep 'correlation: * [0-9].[0-9]*' batch.log | grep -o [0-9].[0-9]*)"
+
+if [ $(bc <<< "$CORRELATION >= 0.8") ] ; then
+
+ date >> batch.log
+ echo "# MERGING FASTQ FILES (CORRELATION = $CORRELATION)"
+ cd GSE26014
+ mkdir GSM638310-11
+ cat GSM638310/GSM638310.fastq GSM638311/GSM638311.fastq > GSM638310-11/GSM638310-11.fastq
+ cd ..
+
+ date >> batch.log
+ echo '# REPROCESSING MERGED FASTQ FILES' >> batch.log
+ get_data -g GSE26014 -m GSM638310-11 -x hg19 --merged >> batch.log
+
+ date >> batch.log
+ echo '# REPROCESSING SAM FILES' >> batch.log
+ sam2bigWig -g GSE26014 -m GSM638310-11 -x hg19 >> batch.log
+
+ date >> batch.log
+ cd GSE26014/GSM638310-11
+ run_MACS2.pl GSM638310-11.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-7 >> ../../batch.log
+
+ date >> batch.log
+ run_MACS2.pl GSM638310-11.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-5 >> ../../batch.log
+
+ date >> batch.log
+ run_MACS2.pl GSM638310-11.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-3 >> ../../batch.log
+
+ date >> batch.log
+ echo '# UPLOADING FILES TO SUPERHANZ' >> batch.log
+ scp GSM638310-11*.b[b,w] lila@superhanz.cscr.cam.ac.uk:htdocs/manuel/
+
+ cd ../..
+
+else
+
+ date >> batch.log
+ echo "# CONTINUING WITHOUT MERGING FILES (CORRELATION = $CORRELATION)"
+
+ date >> batch.log
+ cd GSE26014/GSM638310
+ run_MACS2.pl GSM638310.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-7 >> ../../batch.log
+
+ date >> batch.log
+ cd GSE26014/GSM638310
+ run_MACS2.pl GSM638310.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-5 >> ../../batch.log
+
+ date >> batch.log
+ cd GSE26014/GSM638310
+ run_MACS2.pl GSM638310.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-6 >> ../../batch.log
+
+ date >> batch.log
+ echo '# UPLOADING FILES TO SUPERHANZ' >> batch.log
+ scp GSM638310*.b[b,w] lila@superhanz.cscr.cam.ac.uk:htdocs/manuel/
+
+ cd ../..
+
+ date >> batch.log
+ cd GSE26014/GSM638311
+ run_MACS2.pl GSM638311.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-7 >> ../../batch.log
+
+ date >> batch.log
+ run_MACS2.pl GSM638311.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-5 >> ../../batch.log
+
+ date >> batch.log
+ run_MACS2.pl GSM638311.BED ../../GSE26014/GSM638307/GSM638307.BED hg19 -p 1e-3 >> ../../batch.log
+
+ date >> batch.log
+ echo '# UPLOADING FILES TO SUPERHANZ' >> batch.log
+ scp GSM*.b[b,w] lila@superhanz.cscr.cam.ac.uk:htdocs/manuel/
+
+ cd ../..
+
+fi
+```
+
+
+## How to display peak files?
+
+Using the [Genome Browser Gateway](http://genome-euro.ucsc.edu/cgi-bin/hgGateway) from the USCS site. For a given genome of reference, custom tracks can be uploaded and displayed together.
+
+![image alt text](image_1.jpg)
+
+Different file types are supported. Depending on the format, the peaks profiles may be uploaded or they must be passed through a link.
+
+![image alt text](image_2.jpg)
+
+Some file types, as *bed*, must be uploaded from your local drive. You can copy your records from your pipeline results' folder to your local computer by using `scp`.
+
+```bash
+scp ms2188@tropic:pipeline/manuel/GSE26014/GSM638310-11/GSM638310-11_p1e-5_400bp.bed ./Downloads
+```
+
+Heavier file types, as *bigWig* and *bigBed*, must be retrieved by URL. Use superhanz to upload your files by using `scp`. By default, use the lila user and copy your files in your own folder, inside the htdocs one.
+
+```bash
+scp GSE26014/GSM638307/GSM638307.bw lila@superhanz.cscr.cam.ac.uk:htdocs/manuel/
+```
+
+
+To display your binding profile from the server, you have to complete a track line per sample with the URL and some additional information.
+
+```bash
+track type='bigWig' bigDataUrl='http://lila.results.cscr.cam.ac.uk/manuel/GSM638307.bw' name='GSM638307. Peaks. bigWig.' description='Control. GSE26014. HSPC chromatin input control.' visibility=pack color='31,120,180' 
+
+track type='bigWig' bigDataUrl='http://lila.results.cscr.cam.ac.uk/manuel/GSM6383110-11.bw' name='GSM6383140-11. Peaks. bigWig.' description='Merged. GSE26014. Chromatin IP against PU.1 in HSPC.' visibility=pack color='31,120,180'
+
+track type='bigBed' bigDataUrl='http://lila.results.cscr.cam.ac.uk/manuel/GSM638310-11_p1e-7.bb' name='GSM638310-11. bigBed. p1e-7' description='Merged. GSE26014. Chromatin IP against PU.1 in HSPC. p1e-7' visibility=pack color='31,120,180' 
+
+track type='bigBed' bigDataUrl='http://lila.results.cscr.cam.ac.uk/manuel/GSM638310-11_p1e-5.bb' name='GSM638310-11. bigBed. p1e-5' description='Merged. GSE26014. Chromatin IP against PU.1 in HSPC. p1e-7' visibility=pack color='31,120,180' 
+
+track type='bigBed' bigDataUrl='http://lila.results.cscr.cam.ac.uk/manuel/GSM638310-11_p1e-3.bb' name='GSM638310-11. bigBed. p1e-3' description='Merged. GSE26014. Chromatin IP against PU.1 in HSPC. p1e-7' visibility=pack color='31,120,180' 
+```
