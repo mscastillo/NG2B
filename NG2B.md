@@ -40,7 +40,7 @@ R CMD INSTALL myoldpacakage.tar.gz
 ```
 
 
-## How to create a _GRanges_ from a _bed_ file? <a id="GRanges"></a>
+## How to create a _GRanges_ from a _bed_ file?<a id=GRanges></a>
 
 _GRanges_ (Genomic Ranges) is a class able to record genomic intervals. It allows to store basic information from a _bed_ file type (chromosome, start/end coordinates and strand) as well as additional metadata (IDs, scores, etc...). To use it, first load the package and import the _bed_ file using `read.table`. Later, give a name to the columns of your table and define the _GRanges_ with it by using the `with` function.
 
@@ -64,7 +64,7 @@ names(reads) = c('paired_reads_1','paired_reads_2')
 
 ## How to create a bed file from a _GRanges_?
 
-First, create your own _GRanges_ variable (find it out [here](#bookmark=GRanges)) or load it from any _.Rda_ file using `load`.
+First, create your own _GRanges_ variable (find it out [here](#GRanges)) or load it from any _.Rda_ file using `load`.
 
 ```r
 load('genomic_ranges.Rda')
@@ -223,7 +223,7 @@ nano .ssh/authorized_keys
 > To speed up the connection between servers, consider to set an alias such as `alias superhanz="ssh ms2188@superhanz"`.
 
 
-## How to work safely in the server?
+## How to work safely in the server?<a id="screen"></a>
 
 Using `screen` you can have multiple virtual terminals with just one physical process. 
 
@@ -441,4 +441,4 @@ Alternatively, you can run it in the background and monitor the progress by disp
 tail -f batch.log
 ```
 
-> For jobs that might take a long time to finish, it is highly recommended the use of a screen.
+> For jobs that might take a long time to finish, it is highly recommended the use of a screen (check it how [here](#screen)).
