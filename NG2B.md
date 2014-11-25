@@ -20,7 +20,7 @@ peaks = read.table( file="GSM0001.bed" )
 colnames(peaks) = c("chr","start","end")
 mygrange = GRanges( seqnames=peaks$chr,range=IRanges(start=peaks$start,end=peaks$end,names=paste(peaks$chr,peaks$start,peaks$end,sep="_")),strand="*" )
 ```
-
+(*incomplete*...)
 
 ## How to install an older package?
 
@@ -143,7 +143,6 @@ To get access to the schedules jobs, use the `crontab` command. The `-l` option 
 crontab -l
 ```
 
-
 To edit it, use the `-e` option. Add a new line to set a new scheduled job. The timestamp format is:
 
 ## How to backup a MySQl database?
@@ -187,7 +186,6 @@ ln -s /data
 ls -l
 ```
 
-
 You can also create symbolic links of your favourites programs into **/bin** to avoid using the full path.
 
 ```bash
@@ -224,6 +222,7 @@ nano .ssh/authorized_keys
 
 > To speed up the connection between servers, consider to set an alias such as `alias superhanz="ssh ms2188@superhanz"`.
 
+
 ## How to work safely in the server?
 
 Using `screen` you can have multiple virtual terminals with just one physical process. 
@@ -259,5 +258,187 @@ screen -r 24298
 
 > To improve your experience using `screen`, consider to customize the environment by setting up your `.screenrc` screen. For example:  [.screenrc](https://github.com/mscastillo/bash/blob/master/.screenrc).
 
+
+
+
 # PROCESSING DATA
-_Coming next..._
+
+
+## How to choose random regions from a genome?
+
+If the random regions should be biologically relevant (not falling in centromeres nor telomeres), use the repeat masker table which screens DNA sequences for interspersed repeats and low complexity DNA sequences.
+
+For getting a recent version of this table, go to UCSC table menu and choose the *rmsk* table from your selected genome.![image alt text](image_0.png)
+
+After download it, use `awk` and `shuf` to grab the columns with the genomic coordinates and randomly choose a given number of them.
+
+```
+cat repeatmasker_mm9_all_fields.tsv | awk 'BEGIN{OFS="\t";OFMT="%.f"}{print $6,($7+$8)*0.5-200,($7+$8)*0.5+200}' > repeatmasker_mm9_peaks_400bp.bed
+shuf -n 1000 repeatmasker_mm9_peaks_400bp.bed > random_peaks.bed
+```
+
+
+## How to digest a genome?
+
+Using `hicup_digester` to generate a restriction fragment file in bed format. This program belongs to the HiCup suite (available at http://bioinformatics.babraham.ac.uk/projects) that requires an input genome, in fasta format, the sequence pattern and the cleavage site recognised by the enzyme of interest. 
+
+```bash
+hicup_digester -1 A^AGCTT,HindIII m*.fa
+```
+
+
+## How to convert FASTQ format to FASTA format?
+
+Combining `cat` and `perl` commands.
+
+```bash
+cat file_in.fastq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){print;$i=-3}$i++;}' > file_out.fasta
+```
+
+
+## How to align fastq files?
+
+Aligners: (*i*) `bwa`, (*ii*) `bowtie2` and (*iii*) `tophat`.
+
+### bwa
+
+First check that you have generated an index for your mapping genome. If not, you can generate it using the `index` option.
+
+```bash
+#  copy the fasta file into the folder you want to store the index
+cd /usr/local/bin/bwa/index/human/hg19
+cp ~/hg19.fa .
+bwa index hg19.fa
+```
+
+To perform the alignment, use the `mem` option to get directly a SAM file format.  This option will use the BWA-MEM algorithm. Alternatively, you can use `bwasw` to have additional penalty and gap options. Use the `-t` option to control the number of cores to use.
+
+```bash
+bwa mem -t 4 -R "@RG\tID:mysample" /usr/local/bin/bwa/index/human/hg19/hg19.fa ~/data/mysample.fastq > mysample.sam
+```
+
+
+When having paired-end reads, provided the two mates of each pair in two single files.
+
+```bash
+bwa mem -t 4 -R "@RG\tID:mypesample" /usr/local/bin/bwa/index/human/hg19/hg19.fa ~/data/mypesample_1.fastq ~/data/mypesample_2.fastq  > mypesample.sam
+```
+
+### bowtie2
+
+Once again, generate the corresponding index to your mapping genome by using `bowtie2-build`.
+
+```bash
+# copy the fasta file into the folder you want to store the index
+cd /usr/local/bin/bowtie2/index/human/hg19
+cp ~/hg19.fa .
+bowtie2-build hg19.fa hg19.fa
+```
+
+Once your index is ready, run `bowtie2` with `-q` option for inputs in fastq format and parse the index by using the `-x` option. For multicore options use -`p`. Use `-U` to parse a coma separated list of inputs (or a single file) and `-S` to have the output in *sam* format.
+
+```bash
+bowtie2 -q -p 4 -x /usr/local/bin/bowtie2/index/human/hg19/hg19.fa -U ~/data/mysample.fastq -S ~/data/mysample.sam
+```
+
+### tophat2
+
+Top hat uses bowtie indexes. See how to create it above.
+
+```bash
+#  copy the fasta file into the folder you want to store the index
+cd /usr/local/bin/bowtie2/index/human/hg19
+cp ~/hg19.fa .
+bowtie2 hg19.fa hg19.fa
+```
+
+
+## How to split paired-end reads from a BAM/SAM file?
+
+Using the `samtools` with the `view` option for extracting a subset of reads from a *sam* or a *bam* file. To filter out the reads we are not interested in, use the `-f` option and specify which flag (in hexadecimal format) should contain the reads to keep. For the first and second pairs, use the *0x0040* and *0x0080* flags respectively. Use the `-bh` options to get a BAM format output with its corresponding header.
+
+```bash
+samtools view -bh -f 0x0040 sample.bam > sample_paired_reads_1.bam
+samtools view -bh -f 0x0080 sample.bam > sample_paired_reads_2.bam
+```
+
+
+## How to visualize long-range chromosomal interactions?
+
+Using the *WashU Epigenome Browser* ([WUEB](http://epigenomegateway.wustl.edu/)). The WUEB requires paired-end bed file (tab-separated) with the next format: (*i*) chromosome name, (*ii*) start, (*iii*) end,  (*iv*) coordinate of the mate and a score of the interaction separated by commas, (*v*) identifier (a unique non-negative integer) and (*vi*) the strand (use a dot if unknown it).
+
+```bash
+echo 'chr1   111   222   chr2:333-444,55   1   .' >  mybed.bed
+echo 'chr2   333   444   chr1:111-222,55   2   .' >> mybed.bed
+echo 'chr3   777   888   chr2:777-888,31   1   +' >> mybed.bed
+echo 'chr3   555   666   chr1:555-666,31   2   -' >> mybed.bed
+```
+
+The *bed* file should be sorted and compressed with `bgzip`. Use the `bedSort` tool from the [UCSC programs](http://hgdownload.cse.ucsc.edu/admin/exe/) instead of using any other sorting function. Then, use `tabix` to generate an index of the sorted and compressed bed file.
+
+```bash
+bedSort mybed.bed mybed.sorted.bed
+cat mybed.sorted.bed
+#chr1   111   222   chr2:333-444,55   1   .
+#chr2   333   444   chr1:111-222,55   2   .
+#chr3   555   666   chr1:555-666,31   2   -
+#chr3   777   888   chr2:777-888,31   1   +
+bgzip mybed.sorted.bed
+tabix -p bed mybed.sorted.bed.gz
+```
+
+Later, upload both files to your server and load the data track into the WUEB by parsing the url of the compressed bed file.
+
+
+## How to process ChIP-seq data from GEO?
+
+Use `get_data` to process samples from GEO. This script is available on tropic and runic.
+
+```bash
+ssh tropic
+get_data --help
+```
+
+This utility will automatically download the *sra* files and transform them to raw *fastq* format. Then, it will run `fastqc` to check the quality on each *fastq* file. It will trim the adapters and overrepresented sequences (if present). Later, it will merge the *fastq* files and will run `bowtie2`.
+
+```bash
+get_data -g GSE26014 -m GSM638307 -s SRX/SRX038/SRX038907 -x hg10
+```
+`get_data` will create a deep structure of folders to store the output files in your current directory.
+
+> Before start processing any sample, check which server has less jobs running and if you have enough free disk space by using  `top` (use <kbd>q</kbd> to quit) or  `ps -aF` and `df -h`.
+
+
+## How to process a batch of ChIP-Seq data?
+
+Writing a shell script with all the command lines. The script must start with the *shebang* interpreter line. Subsequently, add the commands you want to execute. For a large batch, consider to save the standard outputs into a log file.
+
+```bash
+#! /bin/bash
+date > batch.log
+# first sample
+get_data -g GSE26014 -m GSM638307 -s SRX/SRX038/SRX038907 -x hg19 >> batch.log
+sam2bigWIG -g GSE26014 -m GSM638307 -x hg19 >> batch.log
+date >> batch.log
+# second sample
+get_data -g GSE26014 -m GSM638308 -s SRX/SRX038/SRX038908 -x hg19 >> batch.log
+date >> batch.log
+sam2bigWIG -g GSE26014 -m GSM638308 -x hg19 >> batch.log
+date >> batch.log
+```
+
+Before execute your script, check whether it is executable.
+
+```bash
+chmod u+x batch.sh
+./batch.sh
+```
+
+Alternatively, you can run it in the background and monitor the progress by displaying the log file.
+
+```bash
+./batch.sh &
+tail -f batch.log
+```
+
+> For jobs that might take a long time to finish, it is highly recommended the use of a screen.
