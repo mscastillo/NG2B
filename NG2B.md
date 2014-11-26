@@ -2,7 +2,7 @@
 
 ## How to make a Venn diagram from peaks files?
 
-Using _Vennerable_, an R package available at _R-Forge_. Its installation may depends on any of the next packages.
+Using _Vennerable_, an *R* package available at *R-Forge*. Its installation may depends on any of the next packages.
 
 ```r
 source("http://bioconductor.org/biocLite.R")
@@ -20,29 +20,30 @@ peaks = read.table( file="GSM0001.bed" )
 colnames(peaks) = c("chr","start","end")
 mygrange = GRanges( seqnames=peaks$chr,range=IRanges(start=peaks$start,end=peaks$end,names=paste(peaks$chr,peaks$start,peaks$end,sep="_")),strand="*" )
 ```
+
 (*incomplete*...)
 
-## How to install an older package?
 
-You can get your current version of _R_ by using the `--version` option.
+## How to install a package in *R*?
 
+Hypothetically, you can install any package from the *CRAN* repository by using the `install.packages` function or using biocLite *Bioconductor* repository.
 
 ```r
-R --version
-#  R version 3.0.1 (2013-05-16) -- "Good Sport"
+install.packages("ggplot2")
+source("http://bioconductor.org/biocLite.R")
+biocLite("ChIPpeakAnno")
 ```
 
-
-To manually install an old package not supported by your current version use the terminal command with the `INSTALL` option.
+Actually, these functions work rarely due to permission problems or version incompatibilities. You can check you current version of *R* by using the `--version` flag in the terminal. Alternatively, you can install any package not supported by your current version manually by using the *R* terminal commands with the `INSTALL` option.
 
 ```bash
-R CMD INSTALL myoldpacakage.tar.gz
+R CMD INSTALL old_package.tar.gz
 ```
 
 
-## How to create a _GRanges_ from a _bed_ file?<a id=GRanges></a>
+## How to create a *GRanges* from a *bed* file?<a id=GRanges></a>
 
-_GRanges_ (Genomic Ranges) is a class able to record genomic intervals. It allows to store basic information from a _bed_ file type (chromosome, start/end coordinates and strand) as well as additional metadata (IDs, scores, etc...). To use it, first load the package and import the _bed_ file using `read.table`. Later, give a name to the columns of your table and define the _GRanges_ with it by using the `with` function.
+*GRanges* (Genomic Ranges) is a class able to record genomic intervals. It allows to store basic information from a *bed* file type (chromosome, start/end coordinates and strand) as well as additional metadata (IDs, scores, etc...). To use it, first load the package and import the *bed* file using `read.table`. Later, give a name to the columns of your table and define the *GRanges* with it by using the `with` function.
 
 ```r
 library('GenomicRanges')
@@ -62,9 +63,9 @@ names(reads) = c('paired_reads_1','paired_reads_2')
 ```
 
 
-## How to create a bed file from a _GRanges_?
+## How to create a bed file from a *GRanges*?
 
-First, create your own _GRanges_ variable (find it out [here](#GRanges)) or load it from any _.Rda_ file using `load`.
+First, create your own *GRanges* variable (find it out [here](#GRanges)) or load it from any *.Rda* file using `load`.
 
 ```r
 load('genomic_ranges.Rda')
@@ -82,7 +83,7 @@ paired_reads_1[1]
 ```
 
 
-Create a _data-frame_ with your selected features-metadata and write it into a file using `write.table`.
+Create a *data-frame* with your selected features-metadata and write it into a file using `write.table`.
 
 ```r
 gr <- filtered$paired_reads_1
@@ -95,7 +96,7 @@ write.table(df,file="paired_reads_1.bed",quote=F,sep="\t",row.names=F,col.names=
 
 ## How to mount a server as a local drive?
 
-Using the `ssh` file system client. In the next example, the folder called _codex_ is mounted as a local drive under the name _superhanz_.
+Using the `ssh` file system client. In the next example, the folder called *codex* is mounted as a local drive under the name *superhanz*.
 
 ```bash
 sshfs -o idmap=user ms2188@superhanz.cscr.cam.ac.uk:codex/ superhanz
@@ -199,7 +200,7 @@ bowtie -m 1 -v 2 -S --phred33-quals hg19_ucsc A006.fastq > A006.sam
 
 ## How to manage RSA keys for authentication?
 
-Using `ssh-keygen` you can generate private-public key pairs. Don’t use a _passphrase_ to avoid user monitoring every time you want to login.
+Using `ssh-keygen` you can generate private-public key pairs. Don’t use a *passphrase* to avoid user monitoring every time you want to login.
 
 ```bash
 ssh ms2188@runic
@@ -213,7 +214,7 @@ ssh-keygen -t rsa -C "RSA key from ms2188@runic"
 cat .ssh/id_rsa.pub
 ```
 
-Now just add your _public key_ into the _authorized keys_ file in the server of interest.
+Now just add your *public key* into the *authorized keys* file in the server of interest.
 
 ```bash
 ssh ms2188@superhanz
