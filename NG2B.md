@@ -603,11 +603,11 @@ fi
 
 Using the [Genome Browser Gateway](http://genome-euro.ucsc.edu/cgi-bin/hgGateway) from the USCS site. For a given genome of reference, custom tracks can be uploaded and displayed together.
 
-![image alt text](image_1.jpg)
+![UCSC genome browser](img/image_1.jpg)
 
 Different file types are supported. Depending on the format, the peaks profiles may be uploaded or they must be passed through a link.
 
-![image alt text](image_2.jpg)
+![UCSC genome browser](img/image_2.jpg)
 
 Some file types, as *bed*, must be uploaded from your local drive. You can copy your records from your pipeline results' folder to your local computer by using `scp`.
 
