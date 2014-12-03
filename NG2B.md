@@ -269,7 +269,9 @@ screen -r 24298
 
 If the random regions should be biologically relevant (not falling in centromeres nor telomeres), use the repeat masker table which screens DNA sequences for interspersed repeats and low complexity DNA sequences.
 
-For getting a recent version of this table, go to UCSC table menu and choose the *rmsk* table from your selected genome.![image alt text](image_0.png)
+For getting a recent version of this table, go to UCSC table menu and choose the *rmsk* table from your selected genome.
+
+![UCSC table menu](img/image_0.png)
 
 After download it, use `awk` and `shuf` to grab the columns with the genomic coordinates and randomly choose a given number of them.
 
