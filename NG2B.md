@@ -32,7 +32,7 @@ Hypothetically, you can install any package from the *CRAN* repository by using 
 install.packages("ggplot2")
 source("http://bioconductor.org/biocLite.R")
 biocLite("ChIPpeakAnno")
-```
+```
 
 Actually, these functions work rarely due to permission problems or version incompatibilities. You can check you current version of *R* by using the `--version` flag in the terminal. Alternatively, you can install any package not supported by your current version manually by using the *R* terminal commands with the `INSTALL` option.
 
