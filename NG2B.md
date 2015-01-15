@@ -152,8 +152,6 @@ qstat -q # lists available queues
 
 After running a job, you will have two files with the same name of you script, followed by an **o** or **e** and the job identifier, capturing the standar output and the errors during the execution of the script.
 
-You can kill any job by using `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
-
 ```bash
 qstat -a
 # Job id            Name      ...
@@ -161,6 +159,9 @@ qstat -a
 # 12345[].$CLUSTER  script.sh ...
 for k in $( seq 1 100 ) ; then qdel 12345[$k] ; done
 ```
+
+You can kill and remove from the queue any job by parsing its idenfier to `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
+
 
 ## How to run parallel jobs?
 
