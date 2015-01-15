@@ -186,7 +186,13 @@ echo "" >> $OUTPUT
 rm -rf  $TEMPFOLDER
 ```
 
-> Notice that some PBS parameters can be defined in the header of the document instead of parsing them as a `qsub` option.
+Then, use `qsub` as usual to submit the job array to the cluster.
+
+```bash
+qsub -q short script.sh
+```
+
+> Note that some PBS parameters can be defined in the header of the document instead of parsing them as a `qsub` option.
 
 
 
