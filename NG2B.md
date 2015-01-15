@@ -82,7 +82,6 @@ paired_reads_1[1]
 #    [1]       14 [73565650, 73565700]      - |    KL136:231:D28EKACXX:6:1101:10000:100839       115
 ```
 
-
 Create a *data-frame* with your selected features-metadata and write it into a file using `write.table`.
 
 ```r
@@ -90,6 +89,105 @@ gr <- filtered$paired_reads_1
 df <- data.frame(chr=as.character(seqnames(gr)),starts=start(ranges(gr)),ends=end(ranges(gr)), strand=as.character(strand(gr)),id=c(gr$id),flag=c(gr$flag))
 write.table(df,file="paired_reads_1.bed",quote=F,sep="\t",row.names=F,col.names=F)
 ```
+
+# WORKING IN THE CLUSTER
+
+Next is described how to work on a cluster running `TORQUE` and `MAUI`. Commands, may be different when any other queuing or scheduler is considered.
+
+## How to work within the terminal in the cluster?
+
+To connect to the head node of the cluster use `ssh`, as to connect to any other remote machine. Do not run any job in the frontend node. Instead of this, request a working node by using `qsub`.
+
+```
+ssh $CLUSTER
+qsub -I
+```
+
+The `-I`  parameter will request an interactive shell environment in the default queue. To request it on any other available queues, use the `-q` option.
+
+```
+qsub -q short -I
+```
+
+Parameters related to the bash environment in the working node are stored on some variables from the Portable Batch System (PBS).
+
+```
+qsub -q immediate -I
+echo $PBS_JOBID     # the current job identifier
+echo $PBS_O_WORKDIR # the current working directory
+```
+
+## How to submit jobs to the queue of a cluster?
+
+To submit any job, just use `qsub` followed by the bash script you want run. Optionally use `-q` to choose any other queues. You may also consider the use of `-m` to report by email when the job is terminated or aborted.
+
+```
+qsub -q immediate -m ae script.sh
+```
+
+To submit a large number of jobs, as you might be interested in parallel tasks, send the script as an array by using `-t`.
+
+```
+qsub -q immediate -t 1-100 script.sh
+```
+
+> An array of jobs will execute the same script a given number of times. Take this into account to not overwrite the same working/output files. To redirect the outputs of each job in the array to different files, consider the use of the  `#PBS_ARRAYID` variable in your script.
+
+
+## How to monitor and kill jobs on the cluster?
+
+To list the details of all the jobs submitted by any user, use `showq`. You can consider to filter them to list only yours by piping the output to a `grep` command.
+
+```
+showq | grep "Running"
+```
+
+Alternatively, you can use the `qstat` command from the queuing system to check the status of the jobs, queues and PBS server.
+
+```
+qstat -a # lists the submitted jobs
+qstat -t # list the submitted jobs, expanding the the ones submitted by arrays
+qstat -q # list the available queues
+```
+
+To kill a job use `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
+
+```
+qstat -a
+# Job id            Name      ...
+# ------            ----      ...
+# 12345[].$CLUSTER  script.sh ...
+for k in $( seq 1 100 ) ; then qdel 12345[$k] ; done
+```
+
+## How to run parallel jobs on a cluster?
+
+The best way to run parallel jobs in a cluster is to submit then as an array and interacting with the PBS variables. Next script is a toy example to show how to compute the rows of a 100x100 matrix in parallel.
+
+```bash
+#!/bin/bash
+
+#PBS -t 1-100
+#PBS -l walltime=8:00:00
+
+## PARAMETERS ##########################################################
+   TEMPFOLDER=~/tempfolder.$PBS_ARRAYID
+   mkdir -p $TEMPFOLDER
+   OUTPUTFILE=~/results.$PBS_ARRAYID.txt
+########################################################################
+
+$i=$PBS_ARRAYID
+echo -n row_$i > $OUTPUTFILE
+for j in $( seq 1 100 ) ; do
+  echo -n $'\t'$(( $i + $j )) >> $OUTPUTFILE
+done
+
+echo "" >> $OUTPUT
+rm -rf  $TEMPFOLDER
+```
+
+> Notice that some PBS parameters can be defined in the header of the document instead of parsing them as a `qsub` option.
+
 
 
 # WORKING ON THE SERVERS
