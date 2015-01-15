@@ -98,20 +98,20 @@ Next is described how to work on a cluster running `TORQUE` and `MAUI`. Commands
 
 To connect to the head node of the cluster use `ssh`, as to connect to any other remote machine. Do not run any job in the frontend node. Instead of this, request a working node by using `qsub`.
 
-```
+```bash
 ssh $CLUSTER
 qsub -I
 ```
 
 The `-I`  parameter will request an interactive shell environment in the default queue. To request it on any other available queues, use the `-q` option.
 
-```
+```bash
 qsub -q short -I
 ```
 
 Parameters related to the bash environment in the working node are stored on some variables from the Portable Batch System (PBS).
 
-```
+```bash
 qsub -q immediate -I
 echo $PBS_JOBID     # the current job identifier
 echo $PBS_O_WORKDIR # the current working directory
@@ -121,13 +121,13 @@ echo $PBS_O_WORKDIR # the current working directory
 
 To submit any job, just use `qsub` followed by the bash script you want run. Optionally use `-q` to choose any other queues. You may also consider the use of `-m` to report by email when the job is terminated or aborted.
 
-```
+```bash
 qsub -q immediate -m ae script.sh
 ```
 
 To submit a large number of jobs, as you might be interested in parallel tasks, send the script as an array by using `-t`.
 
-```
+```bash
 qsub -q immediate -t 1-100 script.sh
 ```
 
@@ -138,13 +138,13 @@ qsub -q immediate -t 1-100 script.sh
 
 To list the details of all the jobs submitted by any user, use `showq`. You can consider to filter them to list only yours by piping the output to a `grep` command.
 
-```
+```bash
 showq | grep "Running"
 ```
 
 Alternatively, you can use the `qstat` command from the queuing system to check the status of the jobs, queues and PBS server.
 
-```
+```bash
 qstat -a # lists the submitted jobs
 qstat -t # list the submitted jobs, expanding the the ones submitted by arrays
 qstat -q # list the available queues
@@ -152,7 +152,7 @@ qstat -q # list the available queues
 
 To kill a job use `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
 
-```
+```bash
 qstat -a
 # Job id            Name      ...
 # ------            ----      ...
