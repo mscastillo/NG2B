@@ -32,7 +32,7 @@ Hypothetically, you can install any package from the *CRAN* repository by using 
 install.packages("ggplot2")
 source("http://bioconductor.org/biocLite.R")
 biocLite("ChIPpeakAnno")
-```
+```
 
 Actually, these functions work rarely due to permission problems or version incompatibilities. You can check you current version of *R* by using the `--version` flag in the terminal. Alternatively, you can install any package not supported by your current version manually by using the *R* terminal commands with the `INSTALL` option.
 
@@ -94,9 +94,9 @@ write.table(df,file="paired_reads_1.bed",quote=F,sep="\t",row.names=F,col.names=
 
 Next is described how to work on a cluster running `TORQUE` and `MAUI`. Commands, may be different when any other queuing or scheduler is considered.
 
-## How to work within the terminal in the cluster?
+## How to work within a terminal on the cluster?
 
-To connect to the head node of the cluster use `ssh`, as to connect to any other remote machine. Do not run any job in this frontend node. Instead of this, request a working node by using `qsub`.
+To connect to the head node of the cluster use `ssh`, as to connect to any other remote machine. Do not run any job in this frontend node. Instead, request a working node to the queuing system by using `qsub`.
 
 ```bash
 ssh $CLUSTER
@@ -106,10 +106,10 @@ qsub -I
 The `-I`  parameter will request an interactive shell environment in the default queue. To request it on any other available queues, use the `-q` option.
 
 ```bash
-qsub -q short -I
+qsub -I -q short
 ```
 
-Parameters related to the bash environment in the working node are stored on some variables from the Portable Batch System (PBS).
+Parameters related to the bash environment in the current working node are available on some variables from the Portable Batch System (PBS).
 
 ```bash
 qsub -q immediate -I
@@ -117,7 +117,7 @@ echo $PBS_JOBID     # the current job identifier
 echo $PBS_O_WORKDIR # the current working directory
 ```
 
-## How to submit jobs to the queue of a cluster?
+## How to submit jobs to the queue?
 
 To submit any job, just use `qsub` followed by the bash script you want run. Optionally use `-q` to choose any other queues. You may also consider the use of `-m` to report by email when the job is terminated or aborted.
 
@@ -134,15 +134,15 @@ qsub -q immediate -t 1-100 script.sh
 > An array of jobs will execute the same script a given number of times. Take this into account to not overwrite the same working/output files. To redirect the outputs of each job in the array to different files, consider the use of the `#PBS_ARRAYID` variable in your script.
 
 
-## How to monitor and kill jobs on the cluster?
+## How to monitor and kill jobs?
 
-To list the details of all the jobs submitted by any user, use `showq`. You can consider to filter them to list only yours by piping the output to a `grep` command.
+To list the details of jobs submitted by any user use `showq`. You may consider to filter them by piping the output to a `grep` command.
 
 ```bash
 showq | grep "Running"
 ```
 
-Alternatively, you can use the `qstat` command from the queuing system to check the status of the jobs, queues and PBS server.
+Alternatively, you can use the `qstat` command from the queuing system to check the status of the jobs, the queues and the PBS server.
 
 ```bash
 qstat -a # lists submitted jobs
@@ -150,7 +150,7 @@ qstat -t # lists submitted jobs, expanding the the ones submitted in arrays
 qstat -q # lists available queues
 ```
 
-To kill a job use `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
+You can kill any job by using `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
 
 ```bash
 qstat -a
@@ -160,9 +160,9 @@ qstat -a
 for k in $( seq 1 100 ) ; then qdel 12345[$k] ; done
 ```
 
-## How to run parallel jobs on a cluster?
+## How to run parallel jobs?
 
-The best way to run parallel jobs in a cluster is to submit then as an array and interacting with the PBS variables. Next script is a toy example to show how to compute the rows of a 100x100 matrix in parallel.
+The best way to run parallel jobs on a cluster is to submit them as an array and interacting with the PBS variables. Next script is a toy example that shows how to compute the rows of a 100x100 matrix in parallel.
 
 ```bash
 #!/bin/bash
@@ -186,13 +186,11 @@ echo "" >> $OUTPUT
 rm -rf  $TEMPFOLDER
 ```
 
-Then, use `qsub` as usual to submit the job array to the cluster.
+Then, use `qsub` as usual to submit the job array to the cluster. Note that some PBS parameters can be defined in the header of the document instead of parsing them as a `qsub` option. 
 
 ```bash
 qsub -q short script.sh
 ```
-
-> Note that some PBS parameters can be defined in the header of the document instead of parsing them as a `qsub` option.
 
 
 
