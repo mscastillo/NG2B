@@ -96,7 +96,7 @@ Next is described how to work on a cluster running `TORQUE` and `MAUI`. Commands
 
 ## How to work within the terminal in the cluster?
 
-To connect to the head node of the cluster use `ssh`, as to connect to any other remote machine. Do not run any job in the frontend node. Instead of this, request a working node by using `qsub`.
+To connect to the head node of the cluster use `ssh`, as to connect to any other remote machine. Do not run any job in this frontend node. Instead of this, request a working node by using `qsub`.
 
 ```bash
 ssh $CLUSTER
