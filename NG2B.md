@@ -90,7 +90,7 @@ df <- data.frame(chr=as.character(seqnames(gr)),starts=start(ranges(gr)),ends=en
 write.table(df,file="paired_reads_1.bed",quote=F,sep="\t",row.names=F,col.names=F)
 ```
 
-# WORKING IN THE CLUSTER
+# WORKING ON CLUSTERS
 
 Next is described how to work on a cluster running `TORQUE` and `MAUI`. Commands, may be different when any other queuing or scheduler is considered.
 
@@ -196,7 +196,7 @@ qsub -q short script.sh
 
 
 
-# WORKING ON THE SERVERS
+# WORKING ON SERVERS
 
 ## How to mount a server as a local drive?
 
