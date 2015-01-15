@@ -131,7 +131,7 @@ To submit a large number of jobs, as you might be interested in parallel tasks, 
 qsub -q immediate -t 1-100 script.sh
 ```
 
-> An array of jobs will execute the same script a given number of times. Take this into account to not overwrite the same working/output files. To redirect the outputs of each job in the array to different files, consider the use of the  `#PBS_ARRAYID` variable in your script.
+> An array of jobs will execute the same script a given number of times. Take this into account to not overwrite the same working/output files. To redirect the outputs of each job in the array to different files, consider the use of the `#PBS_ARRAYID` variable in your script.
 
 
 ## How to monitor and kill jobs on the cluster?
@@ -145,9 +145,9 @@ showq | grep "Running"
 Alternatively, you can use the `qstat` command from the queuing system to check the status of the jobs, queues and PBS server.
 
 ```bash
-qstat -a # lists the submitted jobs
-qstat -t # list the submitted jobs, expanding the the ones submitted by arrays
-qstat -q # list the available queues
+qstat -a # lists submitted jobs
+qstat -t # lists submitted jobs, expanding the the ones submitted in arrays
+qstat -q # lists available queues
 ```
 
 To kill a job use `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
