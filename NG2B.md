@@ -134,7 +134,7 @@ qsub -q immediate -t 1-100 script.sh
 > An array of jobs will execute the same script a given number of times. Take this into account to not overwrite the same working/output files. To redirect the outputs of each job in the array to different files, consider the use of the `#PBS_ARRAYID` variable in your script.
 
 
-## How to monitor and kill jobs?
+## How to monitor, manage and kill jobs?
 
 To list the details of jobs submitted by any user use `showq`. You may consider to filter them by piping the output to a `grep` command.
 
@@ -149,6 +149,8 @@ qstat -a # lists submitted jobs
 qstat -t # lists submitted jobs, expanding the the ones submitted in arrays
 qstat -q # lists available queues
 ```
+
+After running a job, you will have two files with the same name of you script, followed by an **o** or **e** and the job identifier, capturing the standar output and the errors during the execution of the script.
 
 You can kill any job by using `qdel`. To kill an arrays of jobs, you will need to kill each subjob in the array one by one. Consider the use of a loop to perform this task.
 
