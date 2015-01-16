@@ -103,13 +103,13 @@ ssh $CLUSTER
 qsub -I
 ```
 
-The `-I`  parameter will request an interactive shell environment in the default queue. To request it on any other available queues, use the `-q` option.
+The `-I`  parameter will request an interactive shell environment in the default queue. To request an terminal in any other queue, use the `-q` option.
 
 ```bash
-qsub -I -q short
+qsub -I -q long
 ```
 
-Parameters related to the bash environment in the current working node are available on some variables from the Portable Batch System (PBS).
+Some parametes related to this new bash environment on the current working node are stored in Portable Batch System (PBS) variables.
 
 ```bash
 qsub -q immediate -I
