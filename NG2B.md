@@ -28,7 +28,7 @@ mygrange = GRanges( seqnames=peaks$chr,range=IRanges(start=peaks$start,end=peaks
 
 Hypothetically, you can install any package from the *CRAN* repository by using the `install.packages` function or using biocLite *Bioconductor* repository.
 
-```r
+```rhttp://lila.results.cscr.cam.ac.uk/manuel/washu_results01.sorted.bed.gz
 install.packages("ggplot2")
 source("http://bioconductor.org/biocLite.R")
 biocLite("ChIPpeakAnno")
@@ -199,6 +199,15 @@ qsub -q short script.sh
 
 # WORKING ON SERVERS
 
+## How to check if a program is installed  ?
+
+Using the `ssh` file system client. In the next example, the folder called *codex* is mounted as a local drive under the name *superhanz*.
+
+```bash
+sshfs -o idmap=user ms2188@superhanz.cscr.cam.ac.uk:codex/ superhanz
+```
+
+
 ## How to mount a server as a local drive?
 
 Using the `ssh` file system client. In the next example, the folder called *codex* is mounted as a local drive under the name *superhanz*.
@@ -217,7 +226,7 @@ sudo aptitude search util-vserver
 ulimit -a
 #  core file size          (blocks, -c) 0
 #  data seg size           (kbytes, -d) unlimited
-#  …
+#  b &
 ulimit -d
 #  unlimited
 ```
@@ -305,7 +314,7 @@ bowtie -m 1 -v 2 -S --phred33-quals hg19_ucsc A006.fastq > A006.sam
 
 ## How to manage RSA keys for authentication?
 
-Using `ssh-keygen` you can generate private-public key pairs. Don’t use a *passphrase* to avoid user monitoring every time you want to login.
+Using `ssh-keygen` you can generate private-public key pairs. Donb t use a *passphrase* to avoid user monitoring every time you want to login.
 
 ```bash
 ssh ms2188@runic
